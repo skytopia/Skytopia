@@ -1,0 +1,5 @@
+name: Skytopia
+main: solar.rpg.skytopia.Main
+softdepend: [Holograms, Votifier]
+depend: [WorldEdit, Skyblock]
+version: 1.1

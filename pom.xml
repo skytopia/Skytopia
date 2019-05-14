@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>solar.rpg</groupId>
+    <artifactId>Skytopia</artifactId>
+    <packaging>jar</packaging>
+    <name>Skytopia</name>
+    <version>1.1</version>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <main.class>solar.rpg.skytopia.Main</main.class>
+    </properties>
+
+    <build>
+        <finalName>${project.name}</finalName>
+        <sourceDirectory>src/main/java</sourceDirectory>
+
+        <resources>
+            <resource>
+                <targetPath>.</targetPath>
+                <filtering>true</filtering>
+                <directory>src/main/resources</directory>
+                <includes>
+                    <include>plugin.yml</include>
+                    <include>config.yml</include>
+                </includes>
+            </resource>
+        </resources>
+
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.8.1</version>
+                <configuration>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+    <repositories>
+        <repository>
+            <id>spigot-repo</id>
+            <url>https://hub.spigotmc.org/nexus/content/groups/public/</url>
+        </repository>
+    </repositories>
+
+    <dependencies>
+        <!-- Spigot -->
+        <dependency>
+            <groupId>org.spigotmc</groupId>
+            <artifactId>spigot-api</artifactId>
+            <version>1.12.2-R0.1-SNAPSHOT</version>
+        </dependency>
+
+        <!-- Skyblock -->
+        <dependency>
+            <groupId>solar.rpg</groupId>
+            <artifactId>floatinganvil</artifactId>
+            <version>3.1.1</version>
+        </dependency>
+        <dependency>
+            <groupId>com.vexsoftware</groupId>
+            <artifactId>nuvotifier-universal</artifactId>
+            <version>2.3.1</version>
+            <systemPath>${project.basedir}/votifier.jar</systemPath>
+            <scope>system</scope>
+        </dependency>
+
+        <!-- Holograms -->
+        <dependency>
+            <groupId>com.sainttx.holograms</groupId>
+            <artifactId>holograms-api</artifactId>
+            <version>2.6-SNAPSHOT</version>
+        </dependency>
+
+        <!-- Command framework -->
+        <dependency>
+            <groupId>com.sk89q</groupId>
+            <artifactId>command-framework-bukkit</artifactId>
+            <version>1.11-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>com.sk89q</groupId>
+            <artifactId>command-framework-core</artifactId>
+            <version>1.11-SNAPSHOT</version>
+        </dependency>
+    </dependencies>
+
+</project>
