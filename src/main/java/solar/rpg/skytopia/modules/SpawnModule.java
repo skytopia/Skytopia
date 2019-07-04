@@ -98,7 +98,7 @@ public class SpawnModule extends Module {
         }
 
         // Players logging in while in a portal block are teleported to spawn.
-        if (event.getPlayer().getLocation().getBlock().getType() == Material.PORTAL)
+        if (event.getPlayer().getLocation().getBlock().getType() == Material.NETHER_PORTAL)
             event.getPlayer().teleport(getProperSpawn());
     }
 
