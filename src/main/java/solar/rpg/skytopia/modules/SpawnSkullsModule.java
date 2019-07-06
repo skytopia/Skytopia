@@ -40,7 +40,7 @@ import java.util.logging.Level;
 public class SpawnSkullsModule extends Module {
 
     /* Reference to Hologram Manager. */
-    private final HologramManager hologramManager;
+    private HologramManager hologramManager;
 
     /* Top island value and top voter player skulls. */
     private Skull TOP_1, TOP_2, TOP_3, VOTE_1, VOTE_2, VOTE_3;
@@ -50,7 +50,12 @@ public class SpawnSkullsModule extends Module {
 
     public SpawnSkullsModule(Main plugin) {
         super(plugin);
-        hologramManager = JavaPlugin.getPlugin(HologramPlugin.class).getHologramManager();
+        try {
+            hologramManager = JavaPlugin.getPlugin(HologramPlugin.class).getHologramManager();
+        } catch (Exception ignored) {
+            hologramManager = null;
+            Main.log(Level.INFO, "Unable to detect Holograms plugin!");
+        }
         voted = new LinkedHashMap<>();
 
         World spawnWorld = plugin.getServer().getWorld("world");
@@ -92,13 +97,15 @@ public class SpawnSkullsModule extends Module {
         VOTE_3.update();
         plugin.main().sql().queue("DELETE FROM `PlayerVotes` WHERE 1");
 
-        Hologram top = hologramManager.getHologram("topvoters");
-        top.removeLine(top.getLine(3));
-        top.addLine(new TextLine(top, ChatColor.GOLD + "#1: " + ChatColor.RED + "No One" + ChatColor.GRAY + " (no votes)"), 3);
-        top.removeLine(top.getLine(4));
-        top.addLine(new TextLine(top, ChatColor.GRAY + "#2: " + ChatColor.RED + "No One" + ChatColor.GRAY + " (no votes)"), 4);
-        top.removeLine(top.getLine(5));
-        top.addLine(new TextLine(top, ChatColor.DARK_RED + "#3: " + ChatColor.RED + "No One" + ChatColor.GRAY + " (no votes)"), 5);
+        if (hologramManager != null) {
+            Hologram top = hologramManager.getHologram("topvoters");
+            top.removeLine(top.getLine(3));
+            top.addLine(new TextLine(top, ChatColor.GOLD + "#1: " + ChatColor.RED + "No One" + ChatColor.GRAY + " (no votes)"), 3);
+            top.removeLine(top.getLine(4));
+            top.addLine(new TextLine(top, ChatColor.GRAY + "#2: " + ChatColor.RED + "No One" + ChatColor.GRAY + " (no votes)"), 4);
+            top.removeLine(top.getLine(5));
+            top.addLine(new TextLine(top, ChatColor.DARK_RED + "#3: " + ChatColor.RED + "No One" + ChatColor.GRAY + " (no votes)"), 5);
+        }
     }
 
     @EventHandler
@@ -119,7 +126,7 @@ public class SpawnSkullsModule extends Module {
         Entry next;
         OfflinePlayer target;
         Iterator<Entry<UUID, Integer>> iterator = Utility.entriesSortedByValues(voted).iterator();
-        Hologram top = hologramManager.getHologram("topvoters");
+        Hologram top = hologramManager == null ? null : hologramManager.getHologram("topvoters");
 
         // Number one voter.
         if (iterator.hasNext()) {
@@ -127,8 +134,10 @@ public class SpawnSkullsModule extends Module {
             target = Bukkit.getOfflinePlayer((UUID) next.getKey());
             VOTE_1.setOwningPlayer(target);
             VOTE_1.update(true);
-            top.removeLine(top.getLine(3));
-            top.addLine(new TextLine(top, ChatColor.GOLD + "#1: " + ChatColor.RED + target.getName() + ChatColor.GRAY + " (" + next.getValue() + " votes)"), 3);
+            if (hologramManager != null) {
+                top.removeLine(top.getLine(3));
+                top.addLine(new TextLine(top, ChatColor.GOLD + "#1: " + ChatColor.RED + target.getName() + ChatColor.GRAY + " (" + next.getValue() + " votes)"), 3);
+            }
         }
         // Number two voter.
         if (iterator.hasNext()) {
@@ -136,8 +145,10 @@ public class SpawnSkullsModule extends Module {
             target = Bukkit.getOfflinePlayer((UUID) next.getKey());
             VOTE_2.setOwningPlayer(target);
             VOTE_2.update(true);
-            top.removeLine(top.getLine(4));
-            top.addLine(new TextLine(top, ChatColor.GRAY + "#2: " + ChatColor.RED + target.getName() + ChatColor.GRAY + " (" + next.getValue() + " votes)"), 4);
+            if (hologramManager != null) {
+                top.removeLine(top.getLine(4));
+                top.addLine(new TextLine(top, ChatColor.GRAY + "#2: " + ChatColor.RED + target.getName() + ChatColor.GRAY + " (" + next.getValue() + " votes)"), 4);
+            }
         }
         // Number three voter.
         if (iterator.hasNext()) {
@@ -145,8 +156,10 @@ public class SpawnSkullsModule extends Module {
             target = Bukkit.getOfflinePlayer((UUID) next.getKey());
             VOTE_3.setOwningPlayer(target);
             VOTE_3.update(true);
-            top.removeLine(top.getLine(5));
-            top.addLine(new TextLine(top, ChatColor.DARK_RED + "#3: " + ChatColor.RED + target.getName() + ChatColor.GRAY + " (" + next.getValue() + " votes)"), 5);
+            if (hologramManager != null) {
+                top.removeLine(top.getLine(5));
+                top.addLine(new TextLine(top, ChatColor.DARK_RED + "#3: " + ChatColor.RED + target.getName() + ChatColor.GRAY + " (" + next.getValue() + " votes)"), 5);
+            }
         }
     }
 
@@ -163,42 +176,52 @@ public class SpawnSkullsModule extends Module {
         Entry<Integer, Integer> next;
         OfflinePlayer target;
         Iterator<Entry<Integer, Integer>> iterator = Utility.entriesSortedByValues(values).iterator();
-        Hologram top = hologramManager.getHologram("topislands");
+        Hologram top = hologramManager == null ? null : hologramManager.getHologram("topvoters");
         if (iterator.hasNext()) {
             next = iterator.next();
             target = Bukkit.getOfflinePlayer(plugin.main().islands().getIsland(next.getKey()).members().getOwner());
             TOP_1.setOwningPlayer(target);
             TOP_1.update(true);
-            top.removeLine(top.getLine(3));
-            top.addLine(new TextLine(top, ChatColor.GOLD + "#1: " + ChatColor.RED + target.getName() + ChatColor.GRAY + " (" + next.getValue() + ")"), 3);
+            if (hologramManager != null) {
+                top.removeLine(top.getLine(3));
+                top.addLine(new TextLine(top, ChatColor.GOLD + "#1: " + ChatColor.RED + target.getName() + ChatColor.GRAY + " (" + next.getValue() + ")"), 3);
+            }
         }
         if (iterator.hasNext()) {
             next = iterator.next();
             target = Bukkit.getOfflinePlayer(plugin.main().islands().getIsland(next.getKey()).members().getOwner());
             TOP_2.setOwningPlayer(target);
             TOP_2.update(true);
-            top.removeLine(top.getLine(4));
-            top.addLine(new TextLine(top, ChatColor.GRAY + "#2: " + ChatColor.RED + target.getName() + ChatColor.GRAY + " (" + next.getValue() + ")"), 4);
+            if (hologramManager != null) {
+                top.removeLine(top.getLine(4));
+                top.addLine(new TextLine(top, ChatColor.GRAY + "#2: " + ChatColor.RED + target.getName() + ChatColor.GRAY + " (" + next.getValue() + ")"), 4);
+            }
         }
         if (iterator.hasNext()) {
             next = iterator.next();
             target = Bukkit.getOfflinePlayer(plugin.main().islands().getIsland(next.getKey()).members().getOwner());
             TOP_3.setOwningPlayer(target);
             TOP_3.update(true);
-            top.removeLine(top.getLine(5));
-            top.addLine(new TextLine(top, ChatColor.DARK_RED + "#3: " + ChatColor.RED + target.getName() + ChatColor.GRAY + " (" + next.getValue() + ")"), 5);
+            if (hologramManager != null) {
+                top.removeLine(top.getLine(5));
+                top.addLine(new TextLine(top, ChatColor.DARK_RED + "#3: " + ChatColor.RED + target.getName() + ChatColor.GRAY + " (" + next.getValue() + ")"), 5);
+            }
         }
         if (iterator.hasNext()) {
             next = iterator.next();
             target = Bukkit.getOfflinePlayer(plugin.main().islands().getIsland(next.getKey()).members().getOwner());
-            top.removeLine(top.getLine(6));
-            top.addLine(new TextLine(top, ChatColor.DARK_GRAY + "#4: " + ChatColor.RED + target.getName() + ChatColor.GRAY + " (" + next.getValue() + ")"), 6);
+            if (hologramManager != null) {
+                top.removeLine(top.getLine(6));
+                top.addLine(new TextLine(top, ChatColor.DARK_GRAY + "#4: " + ChatColor.RED + target.getName() + ChatColor.GRAY + " (" + next.getValue() + ")"), 6);
+            }
         }
         if (iterator.hasNext()) {
             next = iterator.next();
             target = Bukkit.getOfflinePlayer(plugin.main().islands().getIsland(next.getKey()).members().getOwner());
-            top.removeLine(top.getLine(7));
-            top.addLine(new TextLine(top, ChatColor.DARK_GRAY + "#5: " + ChatColor.RED + target.getName() + ChatColor.GRAY + " (" + next.getValue() + ")"), 7);
+            if (hologramManager != null) {
+                top.removeLine(top.getLine(7));
+                top.addLine(new TextLine(top, ChatColor.DARK_GRAY + "#5: " + ChatColor.RED + target.getName() + ChatColor.GRAY + " (" + next.getValue() + ")"), 7);
+            }
         }
     }
 }
